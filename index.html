@@ -16,20 +16,31 @@
     body {
       font-family: 'HelveticaNeue-Light';
     }
+    
     .msg {
       margin: 10px 0;
       padding: 10px;
       width: 400px;
       background-color: #efefef;
     }
+
     #username, #text {
       margin: 5px 0px;
     }
+
     #post {
       padding: 0.5em 1em;
       background-color: #50b1ff;
       border: none;
       color: #FFF;
+    }
+
+    #login {
+      padding: 0.5em 1em;
+      background-color: #DD4B39;
+      border: none;
+      color: #FFF;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -42,7 +53,7 @@
 	</div>
 
 	<div class="container">
-		<input id="username" type="text" placeholder="Name"><br/>
+		<button id="login">Login with Google</button><br/>
 	  	<input id="text" type="text" placeholder="Message"><br/>
 	  	<button id="post">Post</button><br/>
   	</div>
@@ -58,16 +69,20 @@
   	<script>
     	var myFirebase = new Firebase('https://web-chat-app.firebaseio.com/');
 
-    	var usernameInput = document.querySelector('#username');
-    	var textInput = document.querySelector('#text');
-    	var postButton = document.querySelector('#post');
+    	var username = null;
+	    var loginButton = document.querySelector('#login');
+	    var textInput = document.querySelector('#text');
+	    var postButton = document.querySelector('#post');
+	    postButton.style.display = "none";
+	    textInput.style.display = "none";
 
-    	postButton.addEventListener("click", function() {
-	      	var msgUser = usernameInput.value;
-	      	var msgText = textInput.value;
-	      	myFirebase.push({username:msgUser, text:msgText});
-	      	textInput.value = "";
-   		 });
+	    
+	    postButton.addEventListener("click", function() {
+	      var msgUser = username;
+	      var msgText = textInput.value;
+	      myFirebase.push({username:msgUser, text:msgText});
+	      textInput.value = "";
+	    });
 
     	myFirebase.on('child_added', function(snapshot) {
 	      	var msg = snapshot.val();
@@ -86,7 +101,25 @@
 	      	document.getElementById("results").appendChild(msgElement);
     	});
 
+    	loginButton.addEventListener("click", function() {
+	      	myFirebase.authWithOAuthPopup("google", function(error, authData) {
+	        	if (error) {
+	        	  console.log(error);
+	        	} else {
+	        	  console.log(authData);
+	        	}
+	     	 }, {remember: "sessionOnly"});
+    	});
 
+    	myFirebase.onAuth(function (authData) {
+    		if (authData) {
+	   		    username = authData.google.displayName;
+	   		    loginButton.textContent = "Logged in as " + username;
+	   		    loginButton.disabled = true;
+	    		postButton.style.display = "block";
+	    		textInput.style.display = "block";
+    		}
+   		});
   	</script>
 
 	
