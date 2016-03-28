@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Web Chat App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+
+    <style>
+    body {
+      font-family: 'HelveticaNeue-Light';
+    }
+    .msg {
+      margin: 10px 0;
+      padding: 10px;
+      width: 400px;
+      background-color: #efefef;
+    }
+    #username, #text {
+      margin: 5px 0px;
+    }
+    #post {
+      padding: 0.5em 1em;
+      background-color: #50b1ff;
+      border: none;
+      color: #FFF;
+    }
+  </style>
+</head>
+
+<body>
+	<div class="container text-center">
+		<div class="jumbotron">
+			<h1>Web Chat App</h1>
+		</div>
+	</div>
+
+	<div class="container">
+		<input id="username" type="text" placeholder="Name"><br/>
+	  	<input id="text" type="text" placeholder="Message"><br/>
+	  	<button id="post">Post</button><br/>
+  	</div>
+
+  	<div class="container">
+  		<div class="panel panel-default">
+  			<div class="panel-body">
+	  			<div id="results"></div>
+	  		</div>
+	  	</div>
+  	</div>
+
+  	<script>
+    	var myFirebase = new Firebase('https://web-chat-app.firebaseio.com/');
+
+    	var usernameInput = document.querySelector('#username');
+    	var textInput = document.querySelector('#text');
+    	var postButton = document.querySelector('#post');
+
+    	postButton.addEventListener("click", function() {
+	      	var msgUser = usernameInput.value;
+	      	var msgText = textInput.value;
+	      	myFirebase.push({username:msgUser, text:msgText});
+	      	textInput.value = "";
+   		 });
+
+    	myFirebase.on('child_added', function(snapshot) {
+	      	var msg = snapshot.val();
+	      
+	      	var msgUsernameElement = document.createElement("b");
+	      	msgUsernameElement.textContent = msg.username;
+	      
+	      	var msgTextElement = document.createElement("p");
+	      	msgTextElement.textContent = msg.text;
+	
+	      	var msgElement = document.createElement("div");
+	      	msgElement.appendChild(msgUsernameElement);
+	      	msgElement.appendChild(msgTextElement);
+	
+			msgElement.className = "msg";
+	      	document.getElementById("results").appendChild(msgElement);
+    	});
+
+
+  	</script>
+
+	
+</body>
+</html>
