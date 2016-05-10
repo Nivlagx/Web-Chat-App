@@ -149,9 +149,14 @@
 	   		    loginButton.disabled = true;
 	    		postButton.style.display = "block";
 	    		textInput.style.display = "block";
-	    		location.reload();
     		}
    		});
+
+
+    	if (authData) {
+    		location.reload();
+  		};
+
   	</script>
 </body>
 </html>
